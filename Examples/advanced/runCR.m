@@ -1,3 +1,13 @@
+%% Coin cell Lithium-Ion Battery Model
+% This example demonstrates how to setup a simulation of a lithium
+% manganese dioxide (CR) coin cell battery
+
+%%
+
+if mrstPlatform('octave')
+    error('This demo cannot be run from Octave since it does not yet support the use of tables');
+end
+
 clear all
 close all
 clc
