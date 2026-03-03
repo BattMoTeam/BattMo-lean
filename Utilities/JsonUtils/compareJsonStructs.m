@@ -1,12 +1,15 @@
-function flatjsonviewer = compareJson(jsonstruct1, jsonstruct2, name1, name2)
-
+function flatjsonviewer = compareJsonStructs(jsonstruct1, jsonstruct2, name1, name2)
+%%
+% Compare two json structures, set a flag 'equal', 'different' or 'missing' on each entry. Returns the results as an instance of |FlatJsonViewer| for visualization.
+%
+    
     if nargin == 2
         name1 = 'jsonstruct1';
         name2 = 'jsonstruct2';
     end
 
-    flatjsonviewer1 = flattenJsonStruct(jsonstruct1);
-    flatjsonviewer2 = flattenJsonStruct(jsonstruct2);
+    flatjsonviewer1 = flattenJsonStruct(jsonstruct1, 'doprint', false);
+    flatjsonviewer2 = flattenJsonStruct(jsonstruct2, 'doprint', false);
 
     flatjson1 = flatjsonviewer1.flatjson;
     flatjson2 = flatjsonviewer2.flatjson;
@@ -78,7 +81,7 @@ function isequal = compareValue(val1, val2)
             % val1 and val2 have the same fields
             for ifd = 1 : numel(fds)
                 % We compare the values of each field
-                fd = fds{ids}
+                fd = fds{ifd};
                 subisequal = compareValue(val1.(fd), val2.(fd));
                 if ~subisequal
                     isequal = false;

@@ -1,17 +1,27 @@
-function am = setupActiveMaterial(inputparams)
+function y = regularizedPow(x, p, th)
 
-    amName = inputparams.name;
-    
-    switch amName 
-      case 'NMC111'
-        am = NMC111(inputparams);
-      case 'FirstMaterial'
-        am = FirstMaterial(inputparams);
-      otherwise
-        error('active material not recognized');
-    end
+%
+%
+% SYNOPSIS:
+%   function y = regularizedSqrt(x, th)
+%
+% DESCRIPTION: returns regularized square root by using linear interporation between (0, 0) and (th, sqrt(th))
+%
+% PARAMETERS:
+%   x  - input values
+%   th - threshold
+%
+% RETURNS:
+%   y - output values
+%
+
+    y = x; % quick way to create y of same dimension as x and also preserved AD
+    ind = (x <= th);
+    y(~ind) = (x(~ind)).^p;
+    y(ind) = x(ind)/th*th^p;
     
 end
+
 
 
 

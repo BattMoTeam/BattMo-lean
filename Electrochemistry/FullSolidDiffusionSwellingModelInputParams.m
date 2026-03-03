@@ -1,14 +1,21 @@
-function D = computeDiffusionCoefficient_default(c, T)
+classdef FullSolidDiffusionSwellingModelInputParams < FullSolidDiffusionModelInputParams
     
-    % Calculate diffusion coefficients constant for the diffusion coefficient calculation
-    cnst = [ -4.43, -54; 
-             -0.22, 0.0 ];
+    properties
 
-    Tgi = [ 229; 5.0 ];
+        referenceFillInLevel
+        
+    end
     
-    % Diffusion coefficient, [m^2 s^-1]
-    D = 1e-4 .* 10 .^ ( ( cnst(1,1) + cnst(1,2) ./ ( T - Tgi(1) - Tgi(2) .* c .* 1e-3) + cnst(2,1) .* ...
-                          c .* 1e-3) );
+    methods
+        
+        function inputparams = FullSolidDiffusionSwellingModelInputParams(jsonstruct)
+
+            inputparams = inputparams@FullSolidDiffusionModelInputParams(jsonstruct);
+            
+        end
+
+    end
+    
     
 end
 
