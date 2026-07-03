@@ -1,15 +1,26 @@
-function D = computeDiffusionCoefficient_default(c, T)
-    
-    % Calculate diffusion coefficients constant for the diffusion coefficient calculation
-    cnst = [ -4.43, -54; 
-             -0.22, 0.0 ];
+classdef GenericControlModelInputParams < ControlModelInputParams
+%
+    properties
 
-    Tgi = [ 229; 5.0 ];
+        controlsteps
+        
+    end
     
-    % Diffusion coefficient, [m^2 s^-1]
-    D = 1e-4 .* 10 .^ ( ( cnst(1,1) + cnst(1,2) ./ ( T - Tgi(1) - Tgi(2) .* c .* 1e-3) + cnst(2,1) .* ...
-                          c .* 1e-3) );
     
+    methods
+
+        function inputparams = GenericControlModelInputParams(jsonstruct)
+
+        % addon to compensate for matlab json parsing choice
+            if isstruct(jsonstruct.controlsteps)
+                jsonstruct.controlsteps = {jsonstruct.controlsteps};
+            end
+            inputparams = inputparams@ControlModelInputParams(jsonstruct);
+            
+        end
+    end
+    
+        
 end
 
 
