@@ -1,87 +1,64 @@
 classdef MLXnotebookExporter
 
     properties
-
-        % list of the registered mlx notebooks (for info and automatic iteration)
-        notebooknames = {'part_1_battery_modeling_guide'                   , ...
-                         'part_2_battery_modeling_guide'                   , ...
-                         'tutorial_1_a_simple_p2d_model_live'              , ...
-                         'tutorial_2_changing_control_protocol_live'       , ...
-                         'tutorial_3_modify_structural_parameters_live'    , ...
-                         'tutorial_4_modify_material_parameters_live'      , ...
-                         'tutorial_5_simulate_CCCV_cycling_live'           , ...
-                         'tutorial_6_simulate_thermal_performance_live'    , ...
-                         'tutorial_7_a_simple_p4d_model_live'              , ...
-                         'tutorial_8_simulate_a_multilayer_pouch_cell_live', ...
-                         'tutorial_9_simulate_a_cylindrical_cell_live'};
-
-        % list of registered m-scripts (obtained from the test suite)
-        mscripts
-        
-        
+        rootdir
     end
-
+    
     methods
 
         function mne = MLXnotebookExporter()
-            
-            testrunexample = TestRunExamples();
-            mne.mscripts = testrunexample.filename;
+
+            [~, st] = fileattrib(battmoDir());
+            mne.rootdir = st.Name;
             
         end
 
-        function updateDocumentationIpynbs(mne)
-        % Update all the ipynb in the documentation.
-
-            run_note_book = false;
+        function [inputfile, outputfile] = getIOfiles(mne, filename, varargin)
             
-            inputdir  = fullfile(battmoDir(), 'Examples', 'Notebooks');
-            outputdir = fullfile(battmoDir(), 'Documentation', 'pynbnotebooks');
-            
-            for inote = 1 : numel(mne.notebooknames)
-                
-                notebookname = mne.notebooknames{inote};
-                
-                inputfilename  = fullfile(inputdir, [notebookname, '.mlx']);
-                
-                mne.setupIpynbFromMlx(inputfilename, 'outputDirectory', outputdir);
-                
-            end
-
-        end
-
-        function setupMfromMlx(mne, filename, varargin)
-        % Setup M file from mlx
-
             opt = struct('outputDirectory', []);
+            
             opt = merge_options(opt, varargin{:});
 
             assert(exist(filename, 'file') == 2, 'File %s not found.', filename); 
-            inputfilename = which(filename);
+            inputfile = which(filename);
+
+            [~, filename, ext] = fileparts(inputfile);
+            assert(strcmp(ext, '.m'), 'functions is meant to be used for m file')
             
             if isempty(opt.outputDirectory)
-                % if the file is in a directory denoted notebooks, we move the output in the directory above
-                [dirpath, filename, ext] = fileparts(inputfilename);
-                dirpaths = split(dirpath, filesep);
-                lastdir = dirpaths{end};
-                if strcmp(lastdir, 'notebooks')
-                    outputDirectory = strrep(dirpath, [filesep, 'notebooks'], '');
-                elseif strcmp(ext, '.m')
-                    inputfilename = fullfile(dirpath, 'notebooks', [filename, '.mlx']);
-                    outputDirectory = dirpath;
-                else
-                    outputDirectory = dirpath;
+                battmo_filename = strrep(inputfile, strcat(mne.rootdir, filesep), '');
+                notebook_prefix = fullfile(mne.rootdir, 'Notebooks');
+                
+                outputDirectory = fileparts(fullfile(notebook_prefix, battmo_filename));
+                
+                if ~exist(outputDirectory)
+                    % Create the directory if it does not exist
+                    mkdir(outputDirectory);
                 end
             else
-                outputDirectory = opt.outputDirectory;
+                outputDirectory = opt.outputDirectory
             end
-
-            outputfilename = fullfile(outputDirectory, [filename, '.m']);
-
-            export(inputfilename, outputfilename, 'format', 'm');            
+            
+            outputfile = fullfile(outputDirectory, [filename, '.mlx']);
             
         end
-        
+
+        function setupMlxFromM(mne, filename, varargin)
+
+            opt = struct('run'            , false, ...
+                         'outputDirectory', []);
+            opt = merge_options(opt, varargin{:});
+
+            [inputfile, outputfile] = getIOfiles(mne, filename, ...
+                                                 'outputDirectory', opt.outputDirectory);
+            
+            matlab.internal.liveeditor.openAndSave(inputfile, outputfile);
+
+            if opt.run
+                matlab.internal.liveeditor.executeAndSave(outputfile);
+            end
+            
+        end
         
         function setupIpynbFromMlx(mne, filename, varargin)
 
@@ -92,19 +69,19 @@ classdef MLXnotebookExporter
             assert(exist(filename, 'file') == 2, 'File %s not found.', filename);
             
             fullfilename = which(filename);
-            [dirpath, filename, ext] = fileparts(fullfilename);
+            [~, filename, ext] = fileparts(fullfilename);
                                    
             if strcmp(ext, '.mlx')
                 % same directory
                 inputfilename   = fullfilename;
-                outputDirectory = dirpath;
             else
-                outputDirectory = fullfile(dirpath, 'notebooks');
-                inputfilename = fullfile(outputDirectory, [filename, '.mlx']);
-            end            
-
+                inputfilename = mne.getIOfiles(fullfilename)
+            end
+                
             if ~isempty(opt.outputDirectory)
                 outputDirectory = opt.outputDirectory;
+            else
+                outputDirectory = fileparts(inputfilename);
             end
 
             outputfilename = fullfile(outputDirectory, [filename, '.ipynb']);
@@ -130,25 +107,7 @@ classdef MLXnotebookExporter
             
         end
 
-        
-        function setupMlxFromM(mne, filename, varargin)
 
-            opt = struct('run'            , false, ...
-                         'outputDirectory', []);
-            opt = merge_options(opt, varargin{:});
-
-            [inputfile, outputfile] = getIOfiles(mne, filename, ...
-                                                 'outputDirectory', opt.outputDirectory, ...
-                                                 'outputFormat', 'mlx');
-            
-            matlab.internal.liveeditor.openAndSave(inputfile, outputfile);
-
-            if opt.run
-                matlab.internal.liveeditor.executeAndSave(outputfile);
-            end
-            
-        end
-        
         function setupIpynbFromM(mne, filename, varargin)
 
         % From a M-file, generate the notebooks (mlx and ipynb)
@@ -169,40 +128,6 @@ classdef MLXnotebookExporter
             
         end
 
-        function [inputfile, outputfile] = getIOfiles(mne, filename, varargin)
-            
-            opt = struct('outputDirectory', [], ...
-                         'outputFormat', 'mlx');
-            
-            opt = merge_options(opt, varargin{:});
-
-            assert(exist(filename, 'file') == 2, 'File %s not found.', filename); 
-            fullfilename = which(filename);
-            [dirpath, filename, ext] = fileparts(fullfilename);
-
-            if isempty(opt.outputDirectory)
-                outputDirectory = fullfile(dirpath, 'notebooks');
-                if ~exist(outputDirectory)
-                    % Create the directory if it does not exist
-                    mkdir(outputDirectory);
-                end
-            else
-                outputDirectory = opt.outputDirectory
-            end
-
-            switch opt.outputFormat
-              case 'mlx'
-                inputfile  = fullfile(dirpath, [filename, '.m']);
-                outputfile = fullfile(outputDirectory, [filename, '.mlx']);
-              case 'ipynb'
-                inputfile  = fullfile(outputDirectory, [filename, '.mlx']);
-                outputfile = fullfile(outputDirectory, [filename, '.ipynb']);
-              otherwise
-                error('outputFormat not recognized');
-            end
-            
-        end
-
         function runMlxAndSave(mne, filename)
 
         % To run and update the mlx notebook programmatically, it is possible to use:
@@ -211,7 +136,28 @@ classdef MLXnotebookExporter
             matlab.internal.liveeditor.executeAndSave(filename);
 
         end
+        
+        function setupMfromMlx(mne, filename, varargin)
+        % Setup M file from mlx
 
+            opt = struct('outputDirectory', []);
+            opt = merge_options(opt, varargin{:});
+
+            assert(exist(filename, 'file') == 2, 'File %s not found.', filename); 
+            inputfilename = which(filename);
+            
+            if isempty(opt.outputDirectory)
+                outputDirectory = fileparts(inputfilename);
+            else
+                outputDirectory = opt.outputDirectory;
+            end
+
+            outputfilename = fullfile(outputDirectory, [filename, '.m']);
+
+            export(inputfilename, outputfilename, 'format', 'm');            
+            
+        end
+        
     end
 
     methods (Static)
