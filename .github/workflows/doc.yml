@@ -11,11 +11,16 @@ jobs:
     - name: Install Pandoc
       run: |
         sudo apt-get update
-        sudo apt-get install -y pandoc      
+        sudo apt-get install -y pandoc
+    - name: checkout
+      uses: actions/checkout@v4
+    - name: Update submodules
+      run: git submodule update --init      
     - id: deployment
       uses: sphinx-notes/pages@v3
       with:
         publish: false
+        checkout: false
         documentation_path: ./Documentation
         requirements_path: ./Documentation/requirements.txt
     - uses: peaceiris/actions-gh-pages@v3
