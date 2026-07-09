@@ -21,7 +21,7 @@ jobs:
       - name: Create zip with submodules with no notebooks
         run: |
           chmod -R +r .
-          zip -r battmo.zip . -x "./.git/*" "./Documentation/*" "./.gitattributes" "./.github/*" ".gitmodules"          
+          zip -r battmo_with_notebooks.zip . -x "./.git/*" "./Documentation/*" "./.gitattributes" "./.github/*" ".gitmodules"          
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "battmo.zip,battmo-with-notebooks.zip"
+          artifacts: "battmo.zip,battmo_with_notebooks.zip"
