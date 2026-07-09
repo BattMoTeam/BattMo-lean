@@ -17,7 +17,7 @@ jsonstruct_material = parseBattmoJson(fullfile('ParameterData','ParameterSets','
 jsonstruct_geometry = parseBattmoJson(fullfile('Examples', 'JsonDataFiles', 'geometryChen.json'));
 
 jsonstruct = mergeStructs({jsonstruct_material, ...
-                               jsonstruct_geometry});
+                           jsonstruct_geometry});
 
 includeDoubleLayer = false;
 
@@ -59,8 +59,8 @@ plot(real(Z), -imag(Z), 'displayname', 'battmo');
 
 docompare = true;
 if docompare
-    p = fileparts(mfilename('fullpath'));
-    data = load(fullfile(p, 'utils', 'pybamm_chen_impedances.mat'));
+    filename = fullfile(battmoDir(), 'Validation', 'Examples', 'Advanced', 'Impedance', 'utils', 'pybamm_chen_impedances.mat');
+    data = load(filename);
     Zpybamm = data.impedances;
     plot(real(Zpybamm), -imag(Zpybamm), 'displayname', 'pybamm');
 end
