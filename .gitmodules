@@ -7,3 +7,6 @@
 [submodule "mrst"]
 	path = Externals/mrst
 	url = https://github.com/SINTEF-AppliedCompSci/MRST.git
+[submodule "Documentation"]
+	path = Documentation
+	url = https://github.com/BattMoTeam/BattMo-doc.git
