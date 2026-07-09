@@ -1,0 +1,3 @@
+{
+  "path" : "../../Notebooks/Examples/Advanced/Plating/runSPMplating.ipynb"
+}

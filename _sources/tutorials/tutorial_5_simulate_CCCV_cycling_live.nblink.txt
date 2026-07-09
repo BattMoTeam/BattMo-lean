@@ -1,0 +1,3 @@
+{
+  "path" : "../../Notebooks/Examples/Tutorials/tutorial_5_simulate_CCCV_cycling_live.ipynb"
+}

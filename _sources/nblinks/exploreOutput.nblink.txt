@@ -1,0 +1,3 @@
+{
+  "path" : "../../Notebooks/Examples/Documentation/exploreOutput.ipynb"
+}
