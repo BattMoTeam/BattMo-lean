@@ -14,10 +14,14 @@ jobs:
       - uses: actions/checkout@v4
         with:
           submodules: recursive
-      - name: Create zip with submodules
+      - name: Create zip with submodules with no notebooks
         run: |
           chmod -R +r .
-          zip -r battmo.zip . -x "./.git/*" "./Documentation/*" "./.gitattributes" "./.github/*" ".gitmodules"
+          zip -r battmo.zip . -x "./.git/*" "./Documentation/*" "./Notebooks/*" "./.gitattributes" "./.github/*" ".gitmodules"
+      - name: Create zip with submodules with no notebooks
+        run: |
+          chmod -R +r .
+          zip -r battmo.zip . -x "./.git/*" "./Documentation/*" "./.gitattributes" "./.github/*" ".gitmodules"          
       - uses: ncipollo/release-action@v1
         with:
-          artifacts: "battmo.zip"
+          artifacts: "battmo.zip,battmo-with-notebooks.zip"
