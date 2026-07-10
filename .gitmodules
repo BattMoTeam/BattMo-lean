@@ -13,6 +13,3 @@
 [submodule "Notebooks"]
 	path = Notebooks
 	url = https://github.com/BattMoTeam/BattMo-notebooks.git
-[submodule "Validation"]
-	path = Validation
-	url = https://github.com/BattMoTeam/BattMo-validation.git
