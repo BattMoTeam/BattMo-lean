@@ -59,7 +59,7 @@ plot(real(Z), -imag(Z), 'displayname', 'battmo');
 
 docompare = true;
 if docompare
-    filename = fullfile(battmoDir(), 'Validation', 'Examples', 'Advanced', 'Impedance', 'utils', 'pybamm_chen_impedances.mat');
+    filename = fullfile(battmoDir(), 'Examples', 'Advanced', 'Impedance', 'utils', 'pybamm_chen_impedances.mat');
     data = load(filename);
     Zpybamm = data.impedances;
     plot(real(Zpybamm), -imag(Zpybamm), 'displayname', 'pybamm');
